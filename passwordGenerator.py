@@ -1,4 +1,5 @@
 from hashlib import sha256
+import random
 
 ALPHABET = ('abcdefghijklmnopqrstuvwxyz'
             'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -17,7 +18,10 @@ def make_password(plaintext, service):
     return ''.join((salt, hsh))
 
 
-def password(plaintext, service, length=10, alphabet=ALPHABET):
+def password(service, length=10, alphabet=ALPHABET):
+    plaintext = [ALPHABET[random.randrange(len(ALPHABET))] for item in range(4)]
+    plaintext = ''.join(plaintext)
+
     raw_hexdigest = make_password(plaintext, service)
 
     num = int(raw_hexdigest, 16)

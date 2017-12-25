@@ -1,16 +1,9 @@
-import sys
 import pickle
 import passwordGenerator
+from hashlib import sha256
+from Encrypt import encrypt, decrypt
 
-
-def main():
-    action = sys.argv[1]
-
-    assert action in ['create', 'get', 'edit', 'remove', 'list'], 'Action not recognized'
-
-    checkFile()
-
-    process(action)
+key = sha256('p4k_zA'.encode()).digest()
 
 
 def checkFile():
@@ -21,33 +14,30 @@ def checkFile():
     file.close()
 
 
-def process(action):
-    if action == 'create' or action == 'edit':
-        service = sys.argv[2]
-        masterPass = sys.argv[3]
-        create(service, masterPass)
-    elif action == 'get':
-        service = sys.argv[2]
-        get(service)
-    elif action == 'remove':
-        service = sys.argv[2]
-        remove(service)
-    elif action == 'list':
-        printAllPasswords()
-
-
 def get(service):
+    global key
     with open('data.pickle', 'rb') as f:
         try:
             data = pickle.load(f)
-            print(data[service])
+            print(decrypt(data[service], key))
         except:
             print("Password not found")
 
 
-def create(service, masterPass):
+def create(service):
+    global key
     data = getDictionary()
-    data[service] = passwordGenerator.password(service, masterPass)
+    password = passwordGenerator.password(service)
+    data[service] = encrypt(password, key)
+    print("Your password is: " + password)
+    # print("Encrypted :" + data[service])
+    writeToFile(data)
+
+
+def add(service, password):
+    global key
+    data = getDictionary()
+    data[service] = encrypt(password, key)
     writeToFile(data)
 
 
@@ -62,12 +52,15 @@ def remove(service):
 
     writeToFile(data)
 
+
 def printAllPasswords():
+    global key
     data = getDictionary()
     if len(data) == 0:
         print("No Passwords Found")
     else:
-        for key, value in data.items(): print(key + " " + value)
+        for service, password in data.items():
+            print(service + " " + decrypt(password, key))
 
 
 def getDictionary():
@@ -82,7 +75,3 @@ def getDictionary():
 def writeToFile(data):
     with open('data.pickle', 'wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
-
-
-if __name__ == '__main__':
-    main()

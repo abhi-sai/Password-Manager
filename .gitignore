@@ -1,3 +1,4 @@
 *.pickle
 *.iml
 *.xml
+*.pyc
