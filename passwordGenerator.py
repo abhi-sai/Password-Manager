@@ -5,7 +5,7 @@ ALPHABET = ('abcdefghijklmnopqrstuvwxyz'
             'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             '0123456789!@#$%^&*()-_')
 
-SECRET_KEY = 'p4k_zA'
+SECRET_KEY = None
 
 
 def get_hexdigest(salt, password):
@@ -34,3 +34,7 @@ def password(service, length=10, alphabet=ALPHABET):
         chars.append(alphabet[idx])
 
     return ''.join(chars)
+
+def setKey(key):
+    global SECRET_KEY
+    SECRET_KEY = key

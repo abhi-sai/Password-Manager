@@ -1,77 +1,60 @@
-import pickle
 import passwordGenerator
 from hashlib import sha256
 from Encrypt import encrypt, decrypt
+import Database
 
-key = sha256('p4k_zA'.encode()).digest()
-
-
-def checkFile():
-    try:
-        file = open('data.pickle', 'r')
-    except FileNotFoundError:
-        file = open('data.pickle', 'w')
-    file.close()
+# key = sha256('p4k_zA'.encode()).digest()
+key = Database.key
 
 
-def get(service):
+def get():
     global key
-    with open('data.pickle', 'rb') as f:
-        try:
-            data = pickle.load(f)
-            print(decrypt(data[service], key))
-        except:
-            print("Password not found")
+    service = input("Enter Service Name: ")
+    if not Database.getData(service):
+        print("Service not found")
+        choice = input("Would you like to enter another Service? (Y/N) : ")
+        if choice == 'Y' or choice == 'y':
+            get()
 
 
-def create(service):
+def create():
     global key
-    data = getDictionary()
+    service = input("Enter Service Name: ")
+    userName = input("Enter User Name: ")
     password = passwordGenerator.password(service)
-    data[service] = encrypt(password, key)
-    print("Your password is: " + password)
-    # print("Encrypted :" + data[service])
-    writeToFile(data)
-
-
-def add(service, password):
-    global key
-    data = getDictionary()
-    data[service] = encrypt(password, key)
-    writeToFile(data)
-
-
-def remove(service):
-    data = getDictionary()
-
-    try:
-        del data[service]
-    except:
-        print("Password not found")
-        return
-
-    writeToFile(data)
-
-
-def printAllPasswords():
-    global key
-    data = getDictionary()
-    if len(data) == 0:
-        print("No Passwords Found")
+    if Database.addData(service, userName, password) is False:
+        choice = input("Service already exists. Would you like to add another service? (Y/N)")
+        if choice == 'y' or choice == 'Y':
+            create()
     else:
-        for service, password in data.items():
-            print(service + " " + decrypt(password, key))
+        print("Your password is: " + password)
 
 
-def getDictionary():
-    with open('data.pickle', 'rb') as f:
-        try:
-            data = pickle.load(f)
-        except:
-            data = dict()
-    return data
+def add():
+    global key
+    service = input("Enter Service Name: ")
+    userName = input("Enter User Name: ")
+    password = input("Enter Password: ")
+    if Database.addData(service, userName, password) is False:
+        choice = input("Service already exists. Would you like to add another service? (Y/N)")
+        if choice == 'y' or choice == 'Y':
+            add()
 
 
-def writeToFile(data):
-    with open('data.pickle', 'wb') as f:
-        pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+def remove():
+    global key
+    service = input("Enter Service Name: ")
+    if Database.removeService(service) is False:
+        print("Service not found")
+        choice = input("Would you like to enter another Service? (Y/N) : ")
+        if choice == 'Y' or choice == 'y':
+            remove()
+
+def edit():
+    global key
+    service = input("Enter Service Name: ")
+    if Database.editService(service) is False:
+        print("Service not found")
+        choice = input("Would you like to enter another Service? (Y/N) : ")
+        if choice == 'Y' or choice == 'y':
+            edit()

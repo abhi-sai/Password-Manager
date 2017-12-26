@@ -27,9 +27,10 @@ def unpad(p):
     return p[:-ord(p[len(p) - 1:])]
 
 
+# For testing encryption
 if __name__ == '__main__':
-    password = 'abhi123'
+    password = input("Enter Password: ")
     key = sha256('p4k_zA'.encode()).digest()
     enc = encrypt(password, key)
     print(enc)
-    print(decrypt('A5OHkBJQNrp8xQGlV9v5MJ7vseawXJk3ynGNNAlBXPI2GbFJUba6Z6yz0fj3W7LM', key))
+    print(decrypt(enc, key))
