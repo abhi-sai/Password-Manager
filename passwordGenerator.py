@@ -18,7 +18,7 @@ def make_password(plaintext, service):
     return ''.join((salt, hsh))
 
 
-def password(service, length=10, alphabet=ALPHABET):
+def create_password(service, length=10, alphabet=ALPHABET):
     plaintext = [ALPHABET[random.randrange(len(ALPHABET))] for item in range(4)]
     plaintext = ''.join(plaintext)
 
